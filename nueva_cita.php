@@ -1,0 +1,452 @@
+<?php
+// Iniciar sesión para manejo de usuario
+session_start();
+
+// Verificar que el usuario esté autenticado, si no, redirigir a login
+if (!isset($_SESSION['usuario']) || empty($_SESSION['usuario']['nombre_completo'])) {
+    echo "<script>
+        alert('Debes iniciar sesión para acceder al portal.');
+        window.location.href = 'login.php';
+    </script>";
+    exit();
+}
+
+// Guardar el nombre completo del usuario para mostrar en la interfaz
+$nombreUsuario = $_SESSION['usuario']['nombre_completo'];
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Portal de Usuario - IPS ServiMed</title>
+  <link rel="icon" href="servimed.ico" />
+
+  <style>
+    /* --- Estilos generales --- */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #e0f2f1;
+    }
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* --- Header --- */
+    header {
+      background-color: #6552cf;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    header img {
+      height: 40px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    /* --- Barra superior con bienvenida, fecha/hora y notificaciones --- */
+    .top-bar {
+      background-color: #68e3d9;
+      color: #081c19;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .top-bar .bienvenida-info {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .top-bar .fecha-hora {
+      font-size: 14px;
+      font-weight: bold;
+      margin-left: 20px;
+    }
+    .notif-container {
+      position: relative;
+      cursor: pointer;
+    }
+    .notif-container img {
+      vertical-align: middle;
+      width: 30px;
+      height: 30px;
+    }
+    #notificaciones {
+      display: none;
+      position: absolute;
+      top: 35px;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 250px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    #notificaciones strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+      color: #6552cf;
+    }
+
+    /* --- Hero image --- */
+    .hero {
+      background-color: white;
+      padding: 10px;
+      text-align: center;
+    }
+    .hero img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* --- Menú de opciones --- */
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      justify-content: center;
+      margin-top: 40px;
+    }
+    .card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background-color: #18a3de;
+      color: #f1ebeb;
+      text-decoration: none;
+      padding: 5px 30px;
+      border-radius: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      width: 250px;
+      height: 120px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .card:hover {
+      background-color: #004d40;
+      transform: scale(1.05);
+      cursor: pointer;
+    }
+    .card.cita-grande {
+      background-color: #000000;
+      color: #ffffff;
+      font-size: 28px;
+    }
+
+    /* --- Formulario de agendar cita --- */
+    form#formCita {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    form#formCita label {
+      font-weight: bold;
+      color: #003366;
+      margin-bottom: 5px;
+      display: block;
+    }
+    form#formCita select,
+    form#formCita input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    form#formCita button {
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    form#formCita button[type="submit"] {
+      background-color: #291fb6;
+      flex: 1;
+    }
+    form#formCita button[type="submit"]:hover {
+      background-color: #1a137a;
+    }
+    form#formCita button[type="reset"] {
+      background-color: #d21c19;
+      flex: 1;
+    }
+    form#formCita button[type="reset"]:hover {
+      background-color: #a21413;
+    }
+    form#formCita .botones-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* --- Tabla citas canceladas --- */
+    .tabla-reasignacion {
+      max-width: 500px;
+      margin: 30px auto;
+      background-color: #f9f9ff;
+      border: 2px dashed #46389f;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    .tabla-reasignacion h3 {
+      color: #3d1e69;
+      text-align: center;
+      margin-top: 0;
+    }
+    .tabla-reasignacion table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .tabla-reasignacion th,
+    .tabla-reasignacion td {
+      padding: 10px;
+      border: 1px solid #bbb;
+      text-align: center;
+    }
+    .tabla-reasignacion thead tr {
+      background-color: #dcd7f9;
+      color: #2c1b5a;
+    }
+    .tabla-reasignacion button {
+      padding: 5px 10px;
+      background-color: #3f389f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .tabla-reasignacion button:hover {
+      background-color: #1e1a6a;
+    }
+    #mensajeReasignacion {
+      margin-top: 15px;
+      color: green;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER con logo y campana de notificaciones -->
+  <header>
+    <div class="logo">
+      <img src="https://img.icons8.com/ios-filled/50/fa314a/heart-with-pulse--v1.png" alt="Corazón" />
+      <h1>IPS ServiMed</h1>
+    </div>
+
+    <!-- Contenedor de notificaciones -->
+    <div class="notif-container" onclick="toggleNotificaciones()">
+      <img src="https://img.icons8.com/ios-glyphs/30/bell.png" alt="Notificaciones" title="Ver notificaciones" />
+      <div id="notificaciones">
+        <strong>Notificaciones:</strong>
+        <ul id="listaNotificaciones">
+          <li>No hay notificaciones nuevas</li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra superior con bienvenida y fecha/hora actual -->
+  <div class="top-bar">
+    <div class="bienvenida-info">Bienvenido(a), <?= htmlspecialchars($nombreUsuario) ?></div>
+    <div class="fecha-hora" id="horaActual"></div>
+  </div>
+
+  <!-- Imagen central (hero) -->
+  <section class="hero">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0kigo369AKCLUVSYPBs4K54t0WQbsfL9Lmw&s" alt="Doctor" height="150px"/>
+  </section>
+
+  <!-- Texto central -->
+  <div style="text-align: center;"> 
+    <h2>Una institución de salud comprometida con el bienestar y la cercanía hacia nuestros usuarios</h2>
+  </div> 
+
+  <!-- Título de sección -->
+  <div style="margin: 10px 0;">
+    <section class="menu" style="padding: 5px 0; margin: 0;">
+      <h2 style="color: royalblue; font-size: 25px; margin: 5;">FECHAS Y HORARIOS DISPONIBLES</h2>
+    </section>
+  </div>
+
+  <!-- FORMULARIO PARA AGENDAR CITA -->
+  <div style="padding: 40px; display: flex; flex-direction: column; align-items: center;">
+    <form id="formCita">
+      
+      <!-- Selección de especialidad -->
+      <label for="especialidad">Selecciona la especialidad:</label>
+      <select id="especialidad" name="especialidad" required>
+        <option value="">-- Escoge una opción --</option>
+        <option value="medico_general">Médico General</option>
+        <option value="optometria">Optometría</option>
+        <option value="odontologia">Odontología</option>
+      </select>
+
+      <!-- Selección de fecha -->
+      <label for="fecha">Selecciona una fecha:</label>
+      <input type="date" id="fecha" name="fecha" required />
+
+      <!-- Selección de horario -->
+      <label for="horario">Selecciona el horario:</label>
+      <select id="horario" name="horario" required>
+        <option value="">-- Escoge un horario --</option>
+        <option value="08:00">08:00 AM</option>
+        <option value="09:00">09:00 AM</option>
+        <option value="10:00">10:00 AM</option>
+        <option value="11:00">11:00 AM</option>
+        <option value="13:00">01:00 PM</option>
+        <option value="14:00">02:00 PM</option>
+        <option value="15:00">03:00 PM</option>
+        <option value="16:00">04:00 PM</option>
+      </select>
+
+      <!-- Botones para agendar o limpiar -->
+      <div class="botones-container">
+        <button type="submit">Agendar</button>
+        <button type="reset">Limpiar</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- TABLA DE CITAS CANCELADAS DISPONIBLES -->
+  <div class="tabla-reasignacion">
+    <h3>Citas Canceladas Disponibles</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Horario</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="tablaReasignacion">
+        <tr>
+          <td>2025-08-02</td>
+          <td>08:00 AM</td>
+          <td>
+            <button onclick="reasignarCita(this)">Reasignar</button>
+          </td>
+        </tr>
+        <tr>
+          <td>2025-08-03</td>
+          <td>14:00 PM</td>
+          <td>
+            <button onclick="reasignarCita(this)">Reasignar</button>
+          </td>
+        </tr>
+        <tr>
+          <td>2025-08-04</td>
+          <td>16:00 PM</td>
+          <td>
+            <button onclick="reasignarCita(this)">Reasignar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="mensajeReasignacion"></div>
+  </div>
+
+</div>
+
+<script>
+  // Función para mostrar u ocultar panel de notificaciones al hacer clic en la campana
+  function toggleNotificaciones() {
+    const panel = document.getElementById('notificaciones');
+    if (panel.style.display === 'block') {
+      panel.style.display = 'none';
+    } else {
+      panel.style.display = 'block';
+    }
+  }
+
+  // Función que se ejecuta al presionar "Reasignar" en una cita cancelada
+  function reasignarCita(boton) {
+    const fila = boton.closest("tr");
+    const fecha = fila.children[0].textContent;
+    const horario = fila.children[1].textContent;
+
+    // Mostrar mensaje confirmando reasignación
+    document.getElementById("mensajeReasignacion").textContent = `Has reasignado la cita del ${fecha} a las ${horario}.`;
+
+    // Eliminar la fila para simular que la cita fue reasignada
+    fila.remove();
+  }
+
+  // Actualizar la fecha y hora actual cada segundo en formato local de Colombia (es-CO)
+  function actualizarHora() {
+    const ahora = new Date();
+
+    const fechaHora = ahora.toLocaleString('es-CO', {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+
+    document.getElementById('horaActual').textContent = fechaHora;
+  }
+  setInterval(actualizarHora, 1000);
+  actualizarHora();
+
+  // Validación y manejo del formulario de agendar cita
+  document.getElementById('formCita').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // Obtener valores seleccionados del formulario
+    const especialidad = document.getElementById('especialidad').value;
+    const fecha = document.getElementById('fecha').value;
+    const horario = document.getElementById('horario').value;
+
+    // Validar que todos los campos estén completos
+    if (!especialidad || !fecha || !horario) {
+      alert("Por favor, selecciona especialidad, fecha y horario.");
+      return;
+    }
+
+    // Mensaje de confirmación con valores seleccionados (puedes cambiar por envío a servidor)
+    alert(`Cita agendada para ${especialidad.replace('_', ' ')} el ${fecha} a las ${horario}.`);
+
+    // Reiniciar formulario después de agendar
+    this.reset();
+  });
+</script>
+
+</body>
+</html>

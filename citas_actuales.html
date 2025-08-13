@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Citas actuales - IPS ServiMed</title>
+  <link rel="icon" href="servimed.ico">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #e0f2f1;
+    }
+
+    .container {
+      width: 100%;
+    }
+
+    /* Encabezado azul */
+    header {
+      background-color: #6552cf;
+      color: white;
+      padding: 20px;
+    }
+
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    header img {
+      height: 40px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    /* Sección de bienvenida y Volver */
+    .top-bar {
+      background-color: #68e3d9;
+      color: #081c19;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .top-bar .left {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .top-bar a {
+      color: #031816;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .top-bar a:hover {
+      text-decoration: underline;
+    }
+
+    /* Hero imagen */
+    .hero {
+      background-color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .hero img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* BARRA DE NAVEGACIÓN CON ÍCONOS */
+    .nav-bar {
+      background-color: #2496f3;
+      padding: 5px 0;
+      text-align: center;
+    }
+
+    .nav-bar ul {
+      list-style: none;
+      margin: 0 auto;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      max-width: 800px;
+    }
+
+    .nav-bar li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .nav-bar a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .nav-bar a img {
+      margin-bottom: 5px;
+    }
+
+    .nav-bar li.active a {
+      background-color: #5c4ad4;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-bar a:hover {
+      background-color: #5c4ad4;
+    }
+    /* BARRA DE NAVEGACIÓN CON RECUADROS BLANCOS Y BORDES AZULES */
+.nav-bar {
+  background-color: #e0f2f1;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.nav-bar ul {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 1000px;
+}
+
+.nav-bar li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-bar a {
+  background-color: #ffffff;
+  color: #0033a0;
+  text-decoration: none;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 30px;
+  border-radius: 15px;
+  border: 2px solid #0033a0;
+  transition: all 0.3s ease;
+  width: 120px;
+}
+
+.nav-bar a img {
+  margin-bottom: 5px;
+  transition: filter 0.3s ease;
+  filter: invert(21%) sepia(100%) saturate(600%) hue-rotate(187deg) brightness(94%) contrast(110%);
+}
+
+.nav-bar a:hover {
+  background-color: #0033a0;
+  color: white;
+}
+
+.nav-bar a:hover img {
+  filter: invert(100%);
+}
+
+.nav-bar li.active a {
+  background-color: #0033a0;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.nav-bar li.active a img {
+  filter: invert(100%);
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <header>
+      <div class="logo">
+        <img src="https://img.icons8.com/ios-filled/50/fa314a/heart-with-pulse--v1.png" alt="Corazón" />
+        <h1>IPS ServiMed</h1>
+      </div>
+    </header>
+
+    <!-- BIENVENIDA Y VOLVER -->
+    <div class="top-bar">
+      <div class="left">
+        <h3>Bienvenido(a), <?= htmlspecialchars($nombreUsuario) ?></h3>
+        <a href="volver.php" style="text-decoration: underline;"> Volver</a>
+      </div>
+      <div>
+        <span><?= date('d/m/Y') ?></span>
+      </div>
+    </div>
+
+    <!-- IMAGEN CENTRAL -->
+    <section class="hero">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0kigo369AKCLUVSYPBs4K54t0WQbsfL9Lmw&s" alt="Doctor" height="150px" />
+    </section>
+
+    <!-- BARRA DE NAVEGACIÓN CON ÍCONOS -->
+<nav class="nav-bar">
+  <ul>
+    <li class="active">
+      <a href="#">
+        <img src="https://img.icons8.com/ios-filled/30/ffffff/calendar--v1.png" alt="Citas" />
+        <span>Citas actuales</span>
+      </a>
+    </li>
+    <li>
+      <a href="Nueva Cita.php">
+        <img src="https://img.icons8.com/ios-filled/30/000000/calendar.png" alt="Nueva Cita" style="filter: brightness(0);" />
+        <span>Nueva Cita</span>
+      </a>
+    </li>
+    <li>
+      <a href="historial.php">
+        <img src="https://img.icons8.com/ios-filled/30/000000/time-machine.png" alt="Historial" style="filter: brightness(0);" />
+        <span>Historial</span>
+      </a>
+    </li>
+    <li>
+      <a href="Usuario.php">
+        <img src="https://img.icons8.com/ios-filled/30/000000/user.png" alt="Usuario" style="filter: brightness(0);" />
+        <span>Actualización de datos /Configuración</span>
+      </a>
+    </li>
+    <li>
+      <a href="soporte_pqrs.php">
+        <img src="https://img.icons8.com/ios-filled/30/000000/help.png" alt="Soporte PQRS" style="filter: brightness(0);" />
+        <span>Soporte PQRS</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+  </div>
+
+ <div style="text-align: center;">
+  <img src="no_hay_agendas.webp" alt="Sin citas agendadas" style="max-width: 300px; margin-bottom: -400px;" />
+  <h2 style="color: #0033a0;">Aún no tiene citas agendadas</h2>
+</div>
+
+  <div style="text-align: center;"
+  <h2> Para agendar una cita selecciona <b> Nueva cita</b> </h2>
+  
+  </div>
+
+
+  </div>
+</body>
+</html>
+
